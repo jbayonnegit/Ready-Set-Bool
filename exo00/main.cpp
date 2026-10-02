@@ -1,0 +1,58 @@
+#include <cstdlib>
+#include <iostream>
+#include <cstdint>
+
+void    printBinary( uint32_t a ) {
+
+    uint32_t result = 0;
+    int32_t tmp = 32768 * 32768;
+
+    for ( size_t i = 0; i < 32 - 1; i++ ) {
+        result = a & tmp ? 1 : 0;
+        tmp >>= 1;
+        std::cout << result ;
+    }
+}
+
+uint32_t adder( uint32_t a, uint32_t b) 
+{
+    // if a and b are odd
+    if ( ( a & 1 ) & ( b & 1 ) ) {
+
+        // a and b are the same
+        if ( a == b ) return a << 1;
+        else 
+        { 
+            uint32_t result = 0;
+            uint32_t index = 1;
+            uint32_t retained = 0;
+            for ( size_t i = 0; i < 32 - 1; i++ ) {
+
+                retained <<= 1;
+                // bit turn to one if ( a XOR b XOR retained ) OR if a AND b AND retained
+                result |=  (( a & index ) ^ ( b & index ) ^ retained ) | (( a & index ) & ( b & index ) & retained); 
+                // retained turn to one if ()
+                retained = (( a & index ) & ( b & index )) | ( retained & (( a & index ) | ( b & index )));
+                index <<= 1;
+            }
+            return result;
+        }
+    }
+    // if a and b are pair
+    return ( a | b );
+}
+
+int main( int ac, char **av ) {
+
+    if ( ac != 3 ) exit(1);
+    uint32_t a = std::atoi( av[1] );
+    uint32_t b = std::atoi( av[2] );
+    std::cout << "binary a : "; printBinary( a );
+    std::cout << std::endl;
+    std::cout << "binary b : "; printBinary( b );
+    std::cout << std::endl << "result binary : "; 
+    printBinary(adder( a , b )) ;
+    std::cout << std::endl;
+    std::cout << "result : " << adder( a , b ) << std::endl;
+    return 0;
+}
