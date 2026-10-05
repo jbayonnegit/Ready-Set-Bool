@@ -51,7 +51,11 @@ bool LogicNode::compute( const bool a, const bool b) const {
 
 bool LogicNode::solve() const {
     
-    if ( _isLeaf ) return _proposal;
+    if ( _isLeaf ) {
+        bool proposal = _proposal;
+        if ( _negation ) proposal = _proposal ? false : true;
+        return proposal;
+    }
     
     bool proposal = compute( _left->solve(), _right->solve() );
     if ( _negation ) proposal = proposal ? false : true;
