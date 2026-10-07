@@ -3,7 +3,7 @@
 #include "LogicOperation.hpp"
 #include <iostream>
 
-LogicNode::LogicNode() : _right(NULL), _left(NULL), _isLeaf( false ), _symbole(0), _proposal(0), _negation(false) {}
+LogicNode::LogicNode() : _right(NULL), _left(NULL), _isLeaf( false ), _symbole(0), _proposal(0), _negation(0) {}
 
 LogicNode::~LogicNode() {
     if ( _left ) delete _left;
@@ -13,13 +13,13 @@ LogicNode::~LogicNode() {
 void LogicNode::initializeProposal( bool proposal ) {
     this->_proposal = proposal;
     this->_isLeaf   = true;
-    this->_negation = false;
+    this->_negation = 0;
 }
 
 void LogicNode::initializeSymbole( char symbole ) {
     this->_symbole  = symbole;
     this->_isLeaf   = false;
-    this->_negation = false;
+    this->_negation = 0;
 }
 
 void LogicNode::setBranches( LogicNode *right, LogicNode *left ) {
@@ -28,7 +28,7 @@ void LogicNode::setBranches( LogicNode *right, LogicNode *left ) {
 }
 
 void LogicNode::setNegation() {
-    this->_negation = true;
+    this->_negation += 1;
 }
 
 bool LogicNode::compute( const bool a, const bool b) const {
@@ -53,11 +53,11 @@ bool LogicNode::solve() const {
     
     if ( _isLeaf ) {
         bool proposal = _proposal;
-        if ( _negation ) proposal = _proposal ? false : true;
+        if ( _negation % 2 == 1 ) proposal = _proposal ? false : true;
         return proposal;
     }
     
     bool proposal = compute( _left->solve(), _right->solve() );
-    if ( _negation ) proposal = proposal ? false : true;
+    if ( _negation % 2 == 1 ) proposal = proposal ? false : true;
     return proposal;
 }

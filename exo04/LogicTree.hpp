@@ -3,13 +3,13 @@ class LogicNode {
 
 	private : 
 		
-		LogicNode	*_right;
-		LogicNode	*_left;
-		bool		_isLeaf;
-
-		char		_symbole;
-		bool		_proposal;
-		bool		_negation;
+		LogicNode		*_right;
+		LogicNode		*_left;
+		bool			_isLeaf;
+	
+		char			_symbole;
+		bool			_proposal;
+		unsigned int	_negation;
 
 	public :
 

@@ -21,24 +21,27 @@ class LogicNode {
 		LogicNode( const LogicNode & copy );
 		~LogicNode();
 
-		void initializeProposal( bool proposal );
-		void initializeSymbole( char symbole );
-		void setBranches( LogicNode *right, LogicNode *left );
+		void 				initializeProposal( bool proposal );
+		void 				initializeSymbole( char symbole );
+		void 				setBranches( LogicNode *right, LogicNode *left );
 
-		void setNegationMark();
-		void setIsLeaf();
-		void setSymbolNegation();
-		void setVariable( char c );
+		void 				setNegationMark();
+		void 				setIsLeaf();
+		void 				setSymbolNegation();
+		void 				setVariable( char c );
 
-		bool compute( const bool a, const bool b ) const ;
-		bool solve() const;
+		bool 				compute( const bool a, const bool b ) const ;
+		bool 				solve() const;
 		
 		std::ostringstream *nodeToString(  std::ostringstream *stream ) const;
-		std::string	treeToString() const;
+		std::string			treeToString() const;
 		
-		LogicNode	*tree_negation();
+		LogicNode			*tree_negation();
 		
-		LogicNode *transformEquivalence( LogicNode *right, LogicNode *left );
+		LogicNode			*transformEquivalence();
+		LogicNode			*transformImplication();
+
+		LogicNode			*negative_normal_form();
 
 		static	LogicNode *createTree( std::string &formula ) {
 
@@ -66,12 +69,9 @@ class LogicNode {
 					nodes.pop();
 
 					char symbole = formula[i];
-					if ( symbole == '=') {
-						node->transformEquivalence( right, left );
-					} else {
-						node->initializeSymbole( symbole );
-						node->setBranches( right, left );
-					}
+					node->initializeSymbole( symbole );
+					node->setBranches( right, left );
+					
 					nodes.push ( node );
 				}
 			}

@@ -10,6 +10,7 @@ class Variable {
 	public :
 
 		Variable();
+		Variable( const Variable &copy );
 		Variable( bool state, char c );
 		~Variable();
 		

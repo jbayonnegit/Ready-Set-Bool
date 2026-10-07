@@ -81,12 +81,12 @@ bool LogicNode::solve() const {
     
     if ( _isLeaf ) {
         bool proposal = _proposal;
-        if ( _negation % 2 == 1 ) proposal = _proposal ? false : true;
+        if ( _negation & 1 ) proposal = _proposal ? false : true;
         return proposal;
     }
     
     bool proposal = compute( _left->solve(), _right->solve() );
-    if ( _negation % 2 == 1 ) proposal = proposal ? false : true;
+    if ( _negation & 1 ) proposal = proposal ? false : true;
     return proposal;
 }
 
@@ -132,22 +132,49 @@ LogicNode *LogicNode::tree_negation() {
     return this;
 }
 
-LogicNode   *LogicNode::transformEquivalence( LogicNode *right, LogicNode *left ) {
+LogicNode   *LogicNode::transformEquivalence() {
 
     LogicNode *newRight = new LogicNode();
     LogicNode *newLeft = new LogicNode();
 
-    newRight->_right = right;
-    newRight->_left = left;
+    newRight->_right = this->_right;
+    newRight->_left = this->_left;
     newRight->_symbole = '>';
 
-    newLeft->_right = new LogicNode( *left);
-    newLeft->_left = new LogicNode( *right );
+    newLeft->_right = new LogicNode( *this->_left);
+    newLeft->_left = new LogicNode( *this->_right );
     newLeft->_symbole = '>';
 
     this->_symbole = '&';
     this->_right = newRight;
     this->_left = newLeft;
+    return this;
+}
+
+LogicNode   *LogicNode::transformImplication()  {
+    
+    _left = _left->tree_negation();
+    this->_symbole = '|';
+    return this;
+}
+
+LogicNode   *LogicNode::negative_normal_form() {
+
+    if ( this->_isLeaf ) {
+        return this;
+    }
+    if ( _symbole == '=') {
+        this->transformEquivalence();
+        _left->transformImplication();
+        _right->transformImplication();
+    }
+    if ( _symbole == '>') this->transformImplication();
+    if ( _negation & 1 && _symbole != 0 ) {
+        this->_negation = 0;
+        this->tree_negation();
+    }
+    _left->negative_normal_form();
+    _right->negative_normal_form();
     return this;
 }
 
@@ -157,7 +184,7 @@ std::ostringstream *LogicNode::nodeToString( std::ostringstream *stream ) const 
         stream = new std::ostringstream();
     if ( _isLeaf ) {
         *stream << _variable->getName();
-        for ( size_t i = 0 ; i < _negation ; i++ ) *stream << '!';
+        if ( _negation & 1 ) *stream << '!';
         return stream;
     }
     _left->nodeToString( stream );
