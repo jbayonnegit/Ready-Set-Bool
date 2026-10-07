@@ -30,6 +30,7 @@ std::string	negation_normal_form( std::string &formula ){
 
 	LogicNode	*root = LogicNode::createTree( formula );
 	root = root->tree_negation();
+	root = root->tree_negation();
 	negative_form = root->treeToString();
 	return negative_form;
 }

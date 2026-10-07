@@ -3,7 +3,7 @@
 #include "LogicOperation.hpp"
 #include <iostream>
 
-LogicNode::LogicNode() : _right(NULL), _left(NULL), _isLeaf( false ), _symbole(0), _negation(false), _proposal(0), _variable( NULL ) {}
+LogicNode::LogicNode() : _right(NULL), _left(NULL), _isLeaf( false ), _symbole(0), _negation(0), _proposal(0), _variable( NULL ) {}
 
 LogicNode::~LogicNode() {
     if ( _left ) delete _left;
@@ -33,13 +33,13 @@ LogicNode::LogicNode( const LogicNode & copy ) : _isLeaf( copy._isLeaf), _symbol
 void LogicNode::initializeProposal( bool proposal ) {
     this->_proposal = proposal;
     this->_isLeaf   = true;
-    this->_negation = false;
+    this->_negation = 0;
 }
 
 void LogicNode::initializeSymbole( char symbole ) {
     this->_symbole  = symbole;
     this->_isLeaf   = false;
-    this->_negation = false;
+    this->_negation = 0;
 }
 
 void LogicNode::setBranches( LogicNode *right, LogicNode *left ) {
@@ -47,8 +47,8 @@ void LogicNode::setBranches( LogicNode *right, LogicNode *left ) {
     _left = left;
 }
 
-void LogicNode::setNegationMark( bool state ) {
-    this->_negation = state;
+void LogicNode::setNegationMark() {
+    this->_negation += 1;
 }
 
 void LogicNode::setIsLeaf() {
@@ -81,20 +81,19 @@ bool LogicNode::solve() const {
     
     if ( _isLeaf ) {
         bool proposal = _proposal;
-        if ( _negation ) proposal = _proposal ? false : true;
+        if ( _negation % 2 == 1 ) proposal = _proposal ? false : true;
         return proposal;
     }
     
     bool proposal = compute( _left->solve(), _right->solve() );
-    if ( _negation ) proposal = proposal ? false : true;
+    if ( _negation % 2 == 1 ) proposal = proposal ? false : true;
     return proposal;
 }
 
 LogicNode *LogicNode::tree_negation() {
 
     if ( _isLeaf ) {
-        bool state = this->_negation == true ? false : true;
-        this->setNegationMark(state );
+        this->setNegationMark();
         return this;
     }
 
@@ -158,7 +157,7 @@ std::ostringstream *LogicNode::nodeToString( std::ostringstream *stream ) const 
         stream = new std::ostringstream();
     if ( _isLeaf ) {
         *stream << _variable->getName();
-        if ( _negation ) *stream << '!';
+        for ( size_t i = 0 ; i < _negation ; i++ ) *stream << '!';
         return stream;
     }
     _left->nodeToString( stream );

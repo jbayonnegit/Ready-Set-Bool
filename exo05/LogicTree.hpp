@@ -6,14 +6,14 @@ class LogicNode {
 
 	private : 
 		
-		LogicNode	*_right;
-		LogicNode	*_left;
-		bool		_isLeaf;
+		LogicNode		*_right;
+		LogicNode		*_left;
+		bool			_isLeaf;
 
-		char		_symbole;
-		bool		_negation;
-		bool		_proposal;
-		Variable	*_variable;
+		char			_symbole;
+		unsigned int	_negation;
+		bool			_proposal;
+		Variable		*_variable;
 
 	public :
 
@@ -25,7 +25,7 @@ class LogicNode {
 		void initializeSymbole( char symbole );
 		void setBranches( LogicNode *right, LogicNode *left );
 
-		void setNegationMark( bool state );
+		void setNegationMark();
 		void setIsLeaf();
 		void setSymbolNegation();
 		void setVariable( char c );
@@ -52,7 +52,7 @@ class LogicNode {
 					nodes.push( node );
 				} else {
 					if ( formula[i] == '!' ) {
-						nodes.top()->setNegationMark( true );
+						nodes.top()->setNegationMark();
 						continue ;
 					}
 					LogicNode *node = new LogicNode();
