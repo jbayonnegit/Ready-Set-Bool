@@ -14,6 +14,7 @@ LogicNode::~LogicNode() {
 		
 LogicNode::LogicNode( const LogicNode & copy ) : _isLeaf( copy._isLeaf), _symbole( copy._symbole ), _negation( copy._negation ), _proposal( copy._proposal ) {
 
+        
     if ( copy._right == NULL ) 
         _right = NULL;
     else 
