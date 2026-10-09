@@ -29,7 +29,15 @@ std::string	conjunctive_normal_form( std::string &formula ){
 	std::string	conjunctive_from;;
 
 	LogicNode	*root = LogicNode::createTree( formula );
-	//root->negative_normal_form();
+	std::cout << "after creation  : "<< root->treeToString() << std::endl;
+	root->transformTree();
+	std::cout << "after transform : "<< root->treeToString() << std::endl;
+	root->negative_normal_form();
+	std::cout << "after negative  : "<< root->treeToString() << std::endl;
+	root->reduce_tree();
+	std::cout << "after reduction  : "<< root->treeToString() << std::endl;
+	root->conjunctive_normal_form();
+	std::cout << "after form      : ";
 	conjunctive_from = root->treeToString();
 	delete root;
 	return conjunctive_from;

@@ -1,6 +1,7 @@
 #include <stack>
 #include "Variable.hpp"
 #include <iostream>
+#include <vector>
 
 class LogicNode {
 
@@ -26,7 +27,7 @@ class LogicNode {
 
 		void 				initializeProposal( bool proposal );
 		void 				initializeSymbole( char symbole );
-		LogicNode			*addBranches( LogicNode *newNode, LogicNode *previousNode );
+		LogicNode			*addBranches(  LogicNode *newNode, LogicNode *toAdd, size_t n );
 
 		void 				setNegationMark();
 		void 				setIsLeaf();
@@ -40,13 +41,14 @@ class LogicNode {
 		std::string			treeToString() const;
 		
 		LogicNode			*tree_negation();
-		
+		void				reduce_tree();
 		LogicNode			*transformEquivalence();
 		LogicNode			*transformImplication();
 		LogicNode			*transformTree();
 
 		LogicNode			*negative_normal_form();
-		LogicNode			*conjunctive_normal_form();
+		void				conjunctive_normal_form();
+		LogicNode   		*distribute( LogicNode *toDistribute, LogicNode *nodes, size_t n, char symbole ) ;
 
 
 		static	LogicNode *createTree( std::string &formula ) {
@@ -77,7 +79,8 @@ class LogicNode {
 						stack_nodes.pop();
 						
 						if ( previousNode->_symbole == symbole ) {
-							newNode = newNode->addBranches( newNode, previousNode );
+							newNode = newNode->addBranches( newNode, previousNode->_connected_nodes, previousNode->_nbBranches );
+    						delete previousNode;
 						}
 						else {
 							if ( !newNode->_connected_nodes )
