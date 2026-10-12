@@ -221,6 +221,8 @@ LogicNode   *LogicNode::transformEquivalence() {
 	_connected_nodes[0] = LogicNode(*left);
 	_connected_nodes[1] = LogicNode(*right);
 	_nbBranches = 2;
+	delete left;
+	delete right;
 	return this;
 }
 
