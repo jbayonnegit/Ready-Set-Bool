@@ -35,9 +35,10 @@ std::string	conjunctive_normal_form( std::string &formula ){
 	root->negative_normal_form();
 	std::cout << "after negative  : "<< root->treeToString() << std::endl;
 	root->reduce_tree();
-	std::cout << "after reduction  : "<< root->treeToString() << std::endl;
+	std::cout << "after reduction : "<< root->treeToString() << std::endl;
 	root->conjunctive_normal_form();
-	std::cout << "after form      : ";
+	std::cout << "after form CNF  : ";
+	root->reduce_tree();
 	conjunctive_from = root->treeToString();
 	delete root;
 	return conjunctive_from;

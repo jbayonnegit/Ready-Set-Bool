@@ -34,6 +34,10 @@ LogicNode::LogicNode( const LogicNode & copy ) : _isLeaf( copy._isLeaf), _symbol
 
 LogicNode& LogicNode::operator=(const LogicNode& other) {
 
+	if (this == &other) {
+        return *this;
+    }
+
 	_isLeaf = other._isLeaf;
 	_symbole = other._symbole;
 	_negation = other._negation;
@@ -196,35 +200,33 @@ LogicNode *LogicNode::tree_negation() {
 
 LogicNode   *LogicNode::transformEquivalence() {
 
-	LogicNode *newRight = new LogicNode();
-
-	newRight->_connected_nodes = new LogicNode[2];
-	LogicNode *connected_node_right_tmp = newRight->_connected_nodes;
-
-	connected_node_right_tmp = this->_left;
-	connected_node_right_tmp = connected_node_right_tmp + 1;
-	connected_node_right_tmp = this->_right;
-	newRight->_symbole = '>';
-
-	LogicNode *newLeft = new LogicNode();
-
-	newLeft->_connected_nodes = new LogicNode[2];
-	LogicNode *connected_node_left_tmp = newLeft->_connected_nodes;
-
-	connected_node_left_tmp = new LogicNode( *this->_right );
-	connected_node_left_tmp = connected_node_left_tmp + 1;
-	connected_node_left_tmp = new LogicNode( *this->_left);
-	newLeft->_symbole = '>';
-
 	this->_symbole = '&';
-	this->_right = newRight;
-	this->_left = newLeft;
+
+	LogicNode *left = new LogicNode();
+	LogicNode *right = new LogicNode();
+
+	left->_symbole = '>';
+	left->_connected_nodes = new LogicNode[2];
+	left->_connected_nodes[0] = LogicNode( _connected_nodes[0] );
+	left->_connected_nodes[1] = LogicNode( _connected_nodes[1] );
+	left->_nbBranches = 2;
+
+	right->_symbole = '>';
+	right->_connected_nodes = new LogicNode[2];
+	right->_connected_nodes[0] = LogicNode( _connected_nodes[1] );
+	right->_connected_nodes[1] = LogicNode( _connected_nodes[0] );
+	right->_nbBranches = 2;
+	delete []_connected_nodes;
+	_connected_nodes = new LogicNode[2];
+	_connected_nodes[0] = LogicNode(*left);
+	_connected_nodes[1] = LogicNode(*right);
+	_nbBranches = 2;
 	return this;
 }
 
 LogicNode   *LogicNode::transformImplication()  {
 	
-	this->_connected_nodes = this->_connected_nodes->tree_negation();
+	this->_connected_nodes[1].tree_negation();
 	this->_symbole = '|';
 	return this;
 }
