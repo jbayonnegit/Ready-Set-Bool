@@ -87,7 +87,6 @@ void print_truth_table( std::string &formula ) {
 	const std::string	variables_set( stream.str() );	
 	const uint32_t 	table_size = Math::exponent(2, variables_set.size() );
 	
-	std::cout << "table size : " << table_size << std::endl;
 	std::cout << "|";
 	for ( size_t i = 0; i < variables_set.size(); i++ ) {
 		std::cout << " " << variables_set[i] << " |";

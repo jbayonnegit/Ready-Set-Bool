@@ -65,6 +65,7 @@ int main( int argc, char **argv ){
 		exit( 1 );
 	}
 	std::string formula( argv[1] );
-	std::cout << "formula : " << eval_formula( formula ) << std::endl;
+	std::string eval = eval_formula( formula ) ? "true" : "false";
+	std::cout << eval << std::endl;
 	return 0;
 }
