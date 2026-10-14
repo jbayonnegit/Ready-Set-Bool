@@ -41,6 +41,8 @@ class LogicNode {
 		LogicNode			*transformEquivalence();
 		LogicNode			*transformImplication();
 
+		LogicNode   		*transformExclusiveDisjunction();
+		LogicNode			*transformTree();
 		LogicNode			*negative_normal_form();
 
 		static	LogicNode *createTree( std::string &formula ) {

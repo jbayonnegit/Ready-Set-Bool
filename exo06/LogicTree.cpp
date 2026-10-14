@@ -233,6 +233,36 @@ LogicNode   *LogicNode::transformImplication()  {
 	return this;
 }
 
+LogicNode   *LogicNode::transformExclusiveDisjunction() {
+
+	this->_symbole = '&';
+
+	LogicNode *left = new LogicNode();
+	LogicNode *right = new LogicNode();
+
+	left->_symbole = '|';
+	left->_connected_nodes = new LogicNode[2];
+	left->_connected_nodes[0] = LogicNode( _connected_nodes[0] );
+	left->_connected_nodes[1] = LogicNode( _connected_nodes[1] );
+	left->_connected_nodes[0].setNegationMark();
+	left->_connected_nodes[1].setNegationMark();
+	left->_nbBranches = 2;
+
+	right->_symbole = '|';
+	right->_connected_nodes = new LogicNode[2];
+	right->_connected_nodes[0] = LogicNode( _connected_nodes[1] );
+	right->_connected_nodes[1] = LogicNode( _connected_nodes[0] );
+	right->_nbBranches = 2;
+	delete []_connected_nodes;
+	_connected_nodes = new LogicNode[2];
+	_connected_nodes[0] = LogicNode(*left);
+	_connected_nodes[1] = LogicNode(*right);
+	_nbBranches = 2;
+	delete left;
+	delete right;
+	return this;
+}
+
 LogicNode   *LogicNode::negative_normal_form() {
 
 	if ( this->_isLeaf ) {
@@ -334,6 +364,7 @@ LogicNode   *LogicNode::transformTree() {
 	}
 	if ( _symbole == '=') this->transformEquivalence();
 	if ( _symbole == '>') this->transformImplication();
+	if ( _symbole == '^') this->transformExclusiveDisjunction();
 
 	LogicNode   *it = this->_connected_nodes;
 	for ( size_t i = 0; i < _nbBranches; i++ ) {

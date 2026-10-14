@@ -43,6 +43,7 @@ class LogicNode {
 		LogicNode			*tree_negation();
 		void				reduce_tree();
 		LogicNode			*transformEquivalence();
+		LogicNode			*transformExclusiveDisjunction();
 		LogicNode			*transformImplication();
 		LogicNode			*transformTree();
 

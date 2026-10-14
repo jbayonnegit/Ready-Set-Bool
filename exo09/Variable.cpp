@@ -38,6 +38,8 @@ void	Variable::setSet( std::vector<int> set ) {
     return ;
 }
 
+
+
 std::vector<int> *Variable::getSet() const {
     return _set;
 }

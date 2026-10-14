@@ -47,24 +47,52 @@ void	assignSetsToVariable( std::map< char, std::vector<int > > &sets_map, std::v
 	}
 }
 
+std::vector<int>	create_universe( std::vector< std::vector<int> > sets ) {
+
+	std::vector<int> universe;
+	bool include;
+
+	for ( size_t i = 0; i < sets.size(); i++ ) {
+		for ( size_t j = 0; j < sets[i].size(); j++ ) {
+			include = false;
+			for ( std::vector<int>::iterator it = universe.begin(); it != universe.end(); it++ ) {
+
+				if ( *it == sets[i][j] ) {
+					include = true;
+					break;
+				}
+			}
+			if (!include) {
+				universe.push_back(sets[i][j]);
+			}
+		}
+	}
+
+	return universe;
+}
+
 std::vector<int>	eval_set( std::string &formula, std::vector< std::vector<int> > sets ){
 	if (!parseFormula( formula )) exit( 1 );
 	
-	std::vector<int>	result;;
+	std::vector<int>	result;
 	std::vector<char> var = extractVariable( formula );
 	std::map< char, std::vector<int > > sets_map;
+	std::vector<int>	universe;
 
 	if ( sets.size() != var.size()) {
 		std::cerr << "[error] Incorrect number of set." << std::endl;	
 		exit( 1 );
 	}
 
+
 	assignSetsToVariable( sets_map, sets, var );
+	
+	universe = create_universe( sets );
 	LogicNode	*root;
 	root = LogicNode::createTree( formula );
-	root->fillTreeWithSet( sets_map );
-	root->negative_normal_form();
+	root->fillTreeWithSet( sets_map, &universe );
 	root->transformTree();
+	root->negative_normal_form();
 	root->reduce_tree();
 	result = root->solve( result );
 	delete root;

@@ -18,6 +18,7 @@ class LogicNode {
 		bool			_proposal;
 		Variable		*_variable;
 		unsigned int	_nbBranches;
+		std::vector<int> *_universe;
 
 	public :
 
@@ -41,18 +42,22 @@ class LogicNode {
 		bool 				solve() const;
 		std::vector<int>	solve( std::vector<int> result ) const;
 		
+		std::vector<int>	inverseSet( std::vector<int> set, std::vector<int> universe ) const;
+
 		std::ostringstream *nodeToString(  std::ostringstream *stream ) const;
 		std::string			treeToString() const;
 		
 		LogicNode			*tree_negation();
 		void				reduce_tree();
 		LogicNode			*transformEquivalence();
+		LogicNode			*transformExclusiveDisjunction();
 		LogicNode			*transformImplication();
 		LogicNode			*transformTree();
-		void				fillTreeWithSet( std::map< char, std::vector<int > > &sets_map );
+		void				fillTreeWithSet( std::map< char, std::vector<int > > &sets_map, std::vector<int> *universe );
 		LogicNode			*negative_normal_form();
 		void				conjunctive_normal_form();
 		LogicNode   		*distribute( LogicNode *toDistribute, LogicNode *nodes, size_t n, char symbole ) ;
+		void				setUniverse( std::vector<int> *universe );
 
 
 		static	LogicNode *createTree( std::string &formula ) {

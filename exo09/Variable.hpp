@@ -7,6 +7,7 @@ class Variable {
 		bool			 _state;
 		char			 _name;
 		std::vector<int> *_set;
+		std::vector<int> *_universe;
 	public :
 
 		Variable();
@@ -19,6 +20,8 @@ class Variable {
 		bool	getState() const;
 		char	getName() const;
 		void	setSet( std::vector<int> set );
+		void	setUniverse( std::vector<int> *set );
+		
 		std::vector<int> *getSet() const;
 
 };

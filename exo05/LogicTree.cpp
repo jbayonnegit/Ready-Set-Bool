@@ -101,10 +101,8 @@ LogicNode *LogicNode::tree_negation() {
     switch ( _symbole ) {
 
         case '^' : {
-            _symbole = '&';
-            _left = _left->tree_negation();
-            _right = _right->tree_negation();
-            break ;
+            this->transformExclusiveDisjunction();
+            return this->tree_negation();
         }
         case '>' : {
             _symbole = '&';
@@ -130,6 +128,27 @@ LogicNode *LogicNode::tree_negation() {
             break;
         }
     }
+    return this;
+}
+
+LogicNode   *LogicNode::transformExclusiveDisjunction() {
+
+    LogicNode *newRight = new LogicNode();
+    LogicNode *newLeft = new LogicNode();
+
+    newLeft->_right = new LogicNode( *this->_left);
+    newLeft->_left = new LogicNode( *this->_right );
+    newLeft->_symbole = '|';
+
+    newRight->_right = this->_right;
+    newRight->_left = this->_left;
+    newRight->_right->setNegationMark();
+    newRight->_left ->setNegationMark();
+    newRight->_symbole = '|';
+
+    this->_symbole = '&';
+    this->_right = newRight;
+    this->_left = newLeft;
     return this;
 }
 
@@ -159,17 +178,25 @@ LogicNode   *LogicNode::transformImplication()  {
     return this;
 }
 
+LogicNode   *LogicNode::transformTree() {
+
+    if ( this->_isLeaf ) {
+        return this;
+    }
+    if ( _symbole == '^' ) this->transformExclusiveDisjunction();
+    if ( _symbole == '=' ) this->transformEquivalence();
+    if ( _symbole == '>' ) this->transformImplication();
+
+    _left->transformTree();
+    _right->transformTree();
+    return this;
+}
+
 LogicNode   *LogicNode::negative_normal_form() {
 
     if ( this->_isLeaf ) {
         return this;
     }
-    if ( _symbole == '=') {
-        this->transformEquivalence();
-        _left->transformImplication();
-        _right->transformImplication();
-    }
-    if ( _symbole == '>') this->transformImplication();
     if ( _negation & 1 && _symbole != 0 ) {
         this->_negation = 0;
         this->tree_negation();

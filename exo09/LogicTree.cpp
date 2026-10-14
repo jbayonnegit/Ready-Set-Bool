@@ -4,7 +4,7 @@
 #include <iostream>
 #include <algorithm>
 
-LogicNode::LogicNode() : _connected_nodes( NULL ) , _isLeaf( false ), _symbole(0), _negation(0), _proposal(0), _variable( NULL ), _nbBranches(0) {}
+LogicNode::LogicNode() : _connected_nodes( NULL ) , _isLeaf( false ), _symbole(0), _negation(0), _proposal(0), _variable( NULL ), _nbBranches(0), _universe( NULL ) {}
 
 LogicNode::~LogicNode() {
 	if ( this->_connected_nodes ) delete []this->_connected_nodes;
@@ -12,7 +12,7 @@ LogicNode::~LogicNode() {
 }
 
 	
-LogicNode::LogicNode( const LogicNode & copy ) : _isLeaf( copy._isLeaf), _symbole( copy._symbole ), _negation( copy._negation ), _proposal( copy._proposal ), _nbBranches( copy._nbBranches) {
+LogicNode::LogicNode( const LogicNode & copy ) : _isLeaf( copy._isLeaf), _symbole( copy._symbole ), _negation( copy._negation ), _proposal( copy._proposal ), _nbBranches( copy._nbBranches), _universe( copy._universe ) {
 
 	if ( copy._connected_nodes == NULL ) 
 		_connected_nodes = NULL;
@@ -43,6 +43,7 @@ LogicNode& LogicNode::operator=(const LogicNode& other) {
 	_symbole = other._symbole;
 	_negation = other._negation;
 	_proposal = other._proposal;
+	_universe = other._universe;
 
 	if (other._variable == NULL ) 
 		_variable = NULL;
@@ -142,8 +143,10 @@ std::vector<int> LogicNode::compute(std::vector<int> a, std::vector<int> b) cons
 			for ( std::vector<int>::iterator it = a.begin(); it != a.end(); it++ ) {
 				include = false;
 				for ( std::vector<int>::iterator it_b = b.begin(); it_b != b.end(); it_b++ ) {
-					if ( *it == *it_b )
+					if ( *it == *it_b ) {
 						include = true;
+						break;
+					}
 				}
 				if (!include)
 					result.push_back( *it );
@@ -151,8 +154,10 @@ std::vector<int> LogicNode::compute(std::vector<int> a, std::vector<int> b) cons
 			for ( std::vector<int>::iterator it = b.begin(); it != b.end(); it++ ) {
 				include = false;
 				for ( std::vector<int>::iterator it_b = a.begin(); it_b !=a.end(); it_b++ ) {
-					if ( *it == *it_b )
+					if ( *it == *it_b ) {
 						include = true;
+						break;
+					}
 				}
 				if (!include)
 					result.push_back( *it );
@@ -164,8 +169,10 @@ std::vector<int> LogicNode::compute(std::vector<int> a, std::vector<int> b) cons
 			for ( std::vector<int>::iterator it = b.begin(); it != b.end(); it++ ) {
 				bool include = false;
 				for (std::vector<int>::iterator it_res = result.begin(); it_res != result.end(); it_res++) {
-					if ( *it == *it_res)
+					if ( *it == *it_res) {
 						include = true;
+						break;
+					}
 				}
 				if (!include)
 					result.push_back( *it );
@@ -203,11 +210,38 @@ bool	LogicNode::isNeg() const {
 	return _negation % 2 == 1;
 }
 
+std::vector<int>	LogicNode::inverseSet( std::vector<int> set, std::vector<int> universe ) const{
+	
+	std::vector<int> complement;
+	bool include;
+
+
+	for ( std::vector<int>::iterator it = universe.begin(); it != universe.end() ; it++ ) {
+		include = false;
+		for ( std::vector<int>::iterator it_s = set.begin(); it_s != set.end() ; it_s++ ) {
+			if ( *it == *it_s ) {
+				include = true;
+				break ;
+			}
+		}
+		if ( !include ) {
+			complement.push_back( *it );
+		}
+	}
+	return complement;
+}
+
+
+void	LogicNode::setUniverse( std::vector<int> *universe ) {
+    _universe = universe;
+    return ;
+}
+
 std::vector<int> LogicNode::solve( std::vector<int> set ) const {
 	
 	if ( _isLeaf ) {
 		std::vector<int> result = *_variable->getSet();
-		if ( this->isNeg() ) result.clear();
+		if ( this->isNeg() ) result = this->inverseSet( result, *_universe);
 		return result;
 	}
 	std::vector<int>	res;
@@ -288,6 +322,36 @@ LogicNode   *LogicNode::transformEquivalence() {
 	left->_nbBranches = 2;
 
 	right->_symbole = '>';
+	right->_connected_nodes = new LogicNode[2];
+	right->_connected_nodes[0] = LogicNode( _connected_nodes[1] );
+	right->_connected_nodes[1] = LogicNode( _connected_nodes[0] );
+	right->_nbBranches = 2;
+	delete []_connected_nodes;
+	_connected_nodes = new LogicNode[2];
+	_connected_nodes[0] = LogicNode(*left);
+	_connected_nodes[1] = LogicNode(*right);
+	_nbBranches = 2;
+	delete left;
+	delete right;
+	return this;
+}
+
+LogicNode   *LogicNode::transformExclusiveDisjunction() {
+
+	this->_symbole = '&';
+
+	LogicNode *left = new LogicNode();
+	LogicNode *right = new LogicNode();
+
+	left->_symbole = '|';
+	left->_connected_nodes = new LogicNode[2];
+	left->_connected_nodes[0] = LogicNode( _connected_nodes[0] );
+	left->_connected_nodes[1] = LogicNode( _connected_nodes[1] );
+	left->_connected_nodes[0].setNegationMark();
+	left->_connected_nodes[1].setNegationMark();
+	left->_nbBranches = 2;
+
+	right->_symbole = '|';
 	right->_connected_nodes = new LogicNode[2];
 	right->_connected_nodes[0] = LogicNode( _connected_nodes[1] );
 	right->_connected_nodes[1] = LogicNode( _connected_nodes[0] );
@@ -410,6 +474,7 @@ LogicNode   *LogicNode::transformTree() {
 	}
 	if ( _symbole == '=') this->transformEquivalence();
 	if ( _symbole == '>') this->transformImplication();
+	if ( _symbole == '^') this->transformExclusiveDisjunction();
 
 	LogicNode   *it = this->_connected_nodes;
 	for ( size_t i = 0; i < _nbBranches; i++ ) {
@@ -454,14 +519,15 @@ void	LogicNode::reduce_tree() {
 	return ;
 }
 
-void	LogicNode::fillTreeWithSet( std::map< char, std::vector<int > > &sets_map ) {
+void	LogicNode::fillTreeWithSet( std::map< char, std::vector<int > > &sets_map, std::vector<int> *universe ) {
 
+	_universe = universe;
 	if ( _isLeaf ) {
 		_variable->setSet( sets_map.at( _variable->getName() ) );
 		return ;
 	}
 	for ( size_t i = 0; i < _nbBranches; i++ ) {
-		_connected_nodes[i].fillTreeWithSet( sets_map );
+		_connected_nodes[i].fillTreeWithSet( sets_map, universe );
 	}
 }
 
