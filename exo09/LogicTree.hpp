@@ -46,6 +46,7 @@ class LogicNode {
 
 		std::ostringstream *nodeToString(  std::ostringstream *stream ) const;
 		std::string			treeToString() const;
+		LogicNode 			*extractConnectedDistrib( LogicNode * nodes, size_t i );
 		
 		LogicNode			*tree_negation();
 		void				reduce_tree();

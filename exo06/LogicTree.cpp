@@ -38,6 +38,11 @@ LogicNode& LogicNode::operator=(const LogicNode& other) {
         return *this;
     }
 
+	delete []_connected_nodes;
+	_connected_nodes = NULL;
+	delete _variable;
+	_variable = NULL;
+
 	_isLeaf = other._isLeaf;
 	_symbole = other._symbole;
 	_negation = other._negation;
@@ -320,12 +325,17 @@ void    LogicNode::conjunctive_normal_form() {
 				_symbole = '&';
 				LogicNode *_connected_without_child_distrib = extractConnectedDistrib( _connected_nodes, i);
 				LogicNode *childs_distrib = _connected_nodes[i]._connected_nodes;
-				LogicNode *newConnectedNodes = new LogicNode[ _connected_nodes[i]._nbBranches ];					
+				LogicNode *old_connected_nodes = _connected_nodes;
+				LogicNode *newConnectedNodes = new LogicNode[ _connected_nodes[i]._nbBranches ];
 				for ( size_t j = 0; j < _connected_nodes[i]._nbBranches; j++ ) {
-					newConnectedNodes[ j ] = *distribute( &childs_distrib[ j ], _connected_without_child_distrib , _nbBranches - 1, '|');
+					LogicNode *distributed = distribute( &childs_distrib[ j ], _connected_without_child_distrib , _nbBranches - 1, '|');
+					newConnectedNodes[ j ] = *distributed;
+					delete distributed;
 				}
 				_nbBranches =  _connected_nodes[i]._nbBranches;
 				_connected_nodes = newConnectedNodes;
+				delete []_connected_without_child_distrib;
+				delete []old_connected_nodes;
 				reduce_tree();
 			}
 		}

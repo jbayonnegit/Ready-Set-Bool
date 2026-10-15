@@ -39,6 +39,11 @@ LogicNode& LogicNode::operator=(const LogicNode& other) {
         return *this;
     }
 
+	delete []_connected_nodes;
+	_connected_nodes = NULL;
+	delete _variable;
+	_variable = NULL;
+
 	_isLeaf = other._isLeaf;
 	_symbole = other._symbole;
 	_negation = other._negation;
@@ -399,72 +404,53 @@ LogicNode   *LogicNode::distribute( LogicNode *toDistribute, LogicNode *nodes, s
 	return newNode;
 }
 
-void    LogicNode::conjunctive_normal_form() {
-	
-	if ( _isLeaf ) {
-		return ;
+LogicNode *LogicNode::extractConnectedDistrib( LogicNode * nodes, size_t i ) {
+
+	LogicNode *connected = new LogicNode[ _nbBranches - 1 ];
+	LogicNode *tmp = connected;
+
+	size_t j = 0;
+	while ( j < _nbBranches ) {
+		if ( j == i )
+			j++;
+		if ( j >= _nbBranches )
+			break;
+		*tmp = LogicNode( nodes[j] );
+		tmp++;
+		j++;
 	}
+	return connected;
+}
 
-	std::stack<LogicNode *> connected_nodes_distributed;
+void    LogicNode::conjunctive_normal_form() {
 
-	for ( size_t i = 0; i < _nbBranches ; i++ ) {
+	if ( _isLeaf )
+		return ;
 
-		LogicNode   *child = &_connected_nodes[i];
+	if ( _symbole == '|' ) {
 
-		// Do i need to distribute ?
-		if ( child->_symbole == '&' ) {
-
-			// yes, what have I to distribute ?
-			LogicNode   *to_distribute = child->_connected_nodes;
-			// Ok, now how many ?
-
-			for ( size_t k = 0; k < child->_nbBranches; k++ ) {
-				// on what ?
-
-				for ( size_t j = 0; j < _nbBranches ; j++ )
-				{
-					// not on me
-					if ( i != j ) {
-
-						// distribute on child of my sisters
-						LogicNode *distributeOn;
-						size_t  n;
-						if ( _connected_nodes[j]._isLeaf ) {
-							distributeOn = &_connected_nodes[j];
-							n = 1;
-						}
-						else {
-							distributeOn = _connected_nodes[j]._connected_nodes;
-							n = _connected_nodes[j]._nbBranches;   
-						}
-						LogicNode *distributed = distribute( &to_distribute[k], distributeOn, n,'|' );
-						connected_nodes_distributed.push( distributed );
-					}
+		for ( size_t i = 0; i < _nbBranches; i++ ) {
+			if ( _connected_nodes[i]._symbole == '&' ) {
+				_symbole = '&';
+				LogicNode *_connected_without_child_distrib = extractConnectedDistrib( _connected_nodes, i );
+				LogicNode *childs_distrib = _connected_nodes[i]._connected_nodes;
+				LogicNode *old_connected_nodes = _connected_nodes;
+				LogicNode *newConnectedNodes = new LogicNode[ _connected_nodes[i]._nbBranches ];
+				for ( size_t j = 0; j < _connected_nodes[i]._nbBranches; j++ ) {
+					LogicNode *distributed = distribute( &childs_distrib[ j ], _connected_without_child_distrib , _nbBranches - 1, '|');
+					newConnectedNodes[ j ] = *distributed;
+					delete distributed;
 				}
+				_nbBranches =  _connected_nodes[i]._nbBranches;
+				_connected_nodes = newConnectedNodes;
+				delete []_connected_without_child_distrib;
+				delete []old_connected_nodes;
+				reduce_tree();
 			}
 		}
 	}
-	if ( connected_nodes_distributed.size() == 0 ) {
-		for ( size_t i = 0; i < _nbBranches; i++ ) {
-			_connected_nodes[i].conjunctive_normal_form();
-		}        
-		return ;
-	}
-	_symbole = '&';
-	_nbBranches = connected_nodes_distributed.size();
-	LogicNode *_newConnected = new LogicNode[ connected_nodes_distributed.size() ];
-	for ( size_t i = 0; i < _nbBranches ; i++ ) {
-		LogicNode *distributed = connected_nodes_distributed.top(); 
-		connected_nodes_distributed.pop();
-		_newConnected[i] = LogicNode(*distributed);
-		delete distributed;
-	}
-	delete []_connected_nodes;
-	_connected_nodes = _newConnected;
-
-	for ( size_t i = 0; i < _nbBranches; i++ ) {
+	for ( size_t i = 0; i < _nbBranches; i++ )
 		_connected_nodes[i].conjunctive_normal_form();
-	}
 }
 
 LogicNode   *LogicNode::transformTree() {

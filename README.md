@@ -49,11 +49,18 @@ The same tree model supports several types of leaves:
 - named variables for truth tables, NNF, CNF, and SAT;
 - variables associated with integer sets for set evaluation.
 
-For direct Boolean evaluation, the `compute` operation handles `>` and `=` as
-implication and equivalence. Before normalization, `transformTree` rewrites
-these operators using the basic logical operators and removes them from the
-tree. The resulting tree can then be processed by negation and distribution
-rules.
+For direct Boolean evaluation, the `compute` operation handles `^`, `>` and `=`
+as exclusive disjunction, implication, and equivalence. Before normalization,
+`transformTree` rewrites these operators using the basic logical operators and
+removes them from the tree. In particular:
+
+```text
+A ^ B  ⇔  (¬A ∨ ¬B) ∧ (A ∨ B)
+A > B  ⇔  ¬A ∨ B
+A = B  ⇔  (A > B) ∧ (B > A)
+```
+
+The resulting tree can then be processed by negation and distribution rules.
 
 The general transformation pipeline is:
 
