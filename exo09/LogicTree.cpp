@@ -455,18 +455,25 @@ void    LogicNode::conjunctive_normal_form() {
 
 LogicNode   *LogicNode::transformTree() {
 
-	if ( this->_isLeaf ) {
+	if ( this->_isLeaf )
+		return this;
+
+	if ( _symbole == '>' ) {
+		for ( size_t i = 0; i < _nbBranches; i++ )
+			_connected_nodes[i].transformTree();
+
+		this->transformImplication();
 		return this;
 	}
-	if ( _symbole == '=') this->transformEquivalence();
-	if ( _symbole == '>') this->transformImplication();
-	if ( _symbole == '^') this->transformExclusiveDisjunction();
 
-	LogicNode   *it = this->_connected_nodes;
-	for ( size_t i = 0; i < _nbBranches; i++ ) {
-		it->transformTree();
-		it++;
-	}
+	if ( _symbole == '=' )
+		this->transformEquivalence();
+	else if ( _symbole == '^' )
+		this->transformExclusiveDisjunction();
+
+	for ( size_t i = 0; i < _nbBranches; i++ )
+		_connected_nodes[i].transformTree();
+
 	return this;
 }
 

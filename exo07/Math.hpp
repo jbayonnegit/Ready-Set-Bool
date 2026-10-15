@@ -10,7 +10,7 @@ class Math {
             uint32_t result = 0;
             uint32_t index = 1;
 
-            for ( size_t i = 0; i < 32 - 1; i++ ) {
+            for ( size_t i = 0; i < 32; i++ ) {
                 result |=  (( a & index ) ^ ( b & index )); 
                 index <<= 1;
             }
@@ -23,7 +23,7 @@ class Math {
             uint32_t index = 1;
             uint32_t retained = 0;
 
-            for ( size_t i = 0; i < 32 - 1; i++ ) {
+            for ( size_t i = 0; i < 32; i++ ) {
                 retained <<= 1;
                 // bit turn to one if ( a XOR b XOR retained ) OR if a AND b AND retained
                 result |=  (( a & index ) ^ ( b & index ) ^ retained ) | (( a & index ) & ( b & index ) & retained); 
@@ -40,7 +40,7 @@ class Math {
             uint32_t result = 0;
             uint32_t mul = 0;
 
-            for ( size_t i = 0; i < 32 - 1; i++ ) {
+            for ( size_t i = 0; i < 32; i++ ) {
                 mul = (a & index);  
                 if ( mul != 0)
                     result = adder( result, b <<  i );  

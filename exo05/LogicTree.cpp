@@ -183,9 +183,18 @@ LogicNode   *LogicNode::transformTree() {
     if ( this->_isLeaf ) {
         return this;
     }
-    if ( _symbole == '^' ) this->transformExclusiveDisjunction();
-    if ( _symbole == '=' ) this->transformEquivalence();
-    if ( _symbole == '>' ) this->transformImplication();
+
+    if ( _symbole == '>' ) {
+        _left->transformTree();
+        _right->transformTree();
+        this->transformImplication();
+        return this;
+    }
+
+    if ( _symbole == '^' )
+        this->transformExclusiveDisjunction();
+    else if ( _symbole == '=' )
+        this->transformEquivalence();
 
     _left->transformTree();
     _right->transformTree();
