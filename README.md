@@ -6,8 +6,6 @@ This C++ project was developed for the 42 **Ready, Set, Boole!** subject. It
 progressively connects low-level bit manipulation with propositional logic,
 Boolean algebra, and set theory.
 
-The original subject is available in [en.subject.pdf](./en.subject.pdf).
-
 ## Project overview
 
 The project covers:
