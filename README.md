@@ -6,8 +6,6 @@ This C++ project was developed for the 42 **Ready, Set, Boole!** subject. It
 progressively connects low-level bit manipulation with propositional logic,
 Boolean algebra, and set theory.
 
-The original subject is available in [en.subject.pdf](./en.subject.pdf).
-
 ## Project overview
 
 The project covers:
@@ -312,4 +310,12 @@ make -C exo05 fclean
 make -C exo06 fclean
 make -C exo07 fclean
 make -C exo09 fclean
+```
+
+## Command test example
+
+Two expression are equal if they share the same truth table
+
+```
+VAR="ABC>>"; ../exo04/thruth `./CNF "$VAR"` > test1 && ../exo04/thruth "$VAR" > test2; diff test1 test2
 ```
