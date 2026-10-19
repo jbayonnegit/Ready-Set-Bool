@@ -373,7 +373,7 @@ LogicNode   *LogicNode::transformExclusiveDisjunction() {
 
 LogicNode   *LogicNode::transformImplication()  {
 	
-	this->_connected_nodes[1].tree_negation();
+	this->_connected_nodes[0].tree_negation();
 	this->_symbole = '|';
 	return this;
 }

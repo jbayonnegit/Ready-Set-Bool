@@ -33,9 +33,28 @@ std::string Sequence::to_binary_formula( const std::string &formula ) {
     return binary_formula;
 }
 
+const std::vector<Variable>   Sequence::order() const{
+
+    std::vector<Variable> order( *this );
+
+    for ( std::vector<Variable>::iterator it = order.begin(); it != order.end(); it++ ) {
+        for ( std::vector<Variable>::iterator it_ = it + 1; it_ != order.end(); it_++ ) {
+            if ( it->getName() > it_->getName() ) {
+                Variable tmp = *it;
+                *it = *it_;
+                *it_ = tmp;
+            }
+        }
+    }
+    return order;
+}
+
 void    Sequence::print() const {
+
+    std::vector<Variable> order = this->order();
+
     std::cout << "|";
-    for ( typename std::vector<Variable>::const_iterator it = this->begin(); it != this->end(); it++ )
+    for ( std::vector<Variable>::const_iterator it = order.begin(); it != order.end(); it++ )
         std::cout << " " << *it << " |";
     std::cout << " " << result << " |" << std::endl;
 }

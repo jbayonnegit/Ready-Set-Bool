@@ -55,7 +55,7 @@ bool eval_formula( std::string &formula ) {
 
 			char symbole = formula[i];
 			node->initializeSymbole( symbole );
-			node->setBranches( right, left );
+			node->setBranches( left, right );
 			nodes.push ( node );
 		}
 	}
@@ -67,6 +67,21 @@ bool eval_formula( std::string &formula ) {
 	bool result = root->solve();
 	delete root; 
 	return ( result );
+}
+
+std::string orderVariable( std::string set ) {
+
+	for ( size_t i = 0; i < set.size(); i++ ) {
+		for ( size_t j = i + 1; j < set.size(); j++ ) {
+			if ( set[i] > set[j] ) {
+				char tmp = set[i];
+				set[i] = set[j];
+				set[j] = tmp;
+			}
+		}
+	}
+
+	return set;
 }
 
 void print_truth_table( std::string &formula ) {
@@ -87,18 +102,21 @@ void print_truth_table( std::string &formula ) {
 	const std::string	variables_set( stream.str() );	
 	const uint32_t 	table_size = Math::exponent(2, variables_set.size() );
 	
+	std::string set = orderVariable( variables_set );
+
 	std::cout << "|";
-	for ( size_t i = 0; i < variables_set.size(); i++ ) {
-		std::cout << " " << variables_set[i] << " |";
+	for ( size_t i = 0; i < set.size(); i++ ) {
+		std::cout << " " << set[i] << " |";
 	}
+
 	std::cout << " = |" << std::endl;
 	std::cout << "|";
-	for ( size_t i = 0; i < variables_set.size() + 1; i++ ) {
+	for ( size_t i = 0; i < set.size() + 1; i++ ) {
 		std::cout << "---|";
 	}
 	std::cout << std::endl; 
 	for ( size_t i = 0; i < table_size; i++ ) {
-		Sequence _sequence( Math::gray_code(i), variables_set );
+		Sequence _sequence( Math::gray_code(i), set );
 		std::string binary_formula =  _sequence.to_binary_formula( formula );
 		_sequence.result = eval_formula( binary_formula );
 		_sequence.print();

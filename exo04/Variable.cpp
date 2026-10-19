@@ -13,6 +13,12 @@ char Variable::getName() const {
     return _name;
 }
 
+Variable& Variable::operator=(const Variable& other) {
+    _state = other._state;
+    _name = other._name;
+    return *this;
+}
+
 
 std::ostream& operator<<(std::ostream &flux, Variable const &variable) {
     flux << variable.getState();

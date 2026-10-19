@@ -12,6 +12,7 @@ class Variable {
 		Variable();
 		Variable( const Variable &copy );
 		Variable( bool state, char c );
+		Variable& operator=(const Variable& other);
 		~Variable();
 		
 

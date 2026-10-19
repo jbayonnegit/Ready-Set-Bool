@@ -231,9 +231,13 @@ LogicNode   *LogicNode::transformEquivalence() {
 	return this;
 }
 
+bool		LogicNode::isNeg() const {
+	return _negation % 2 == 1;
+}
+
 LogicNode   *LogicNode::transformImplication()  {
 	
-	this->_connected_nodes[1].tree_negation();
+    this->_connected_nodes[0].tree_negation();
 	this->_symbole = '|';
 	return this;
 }

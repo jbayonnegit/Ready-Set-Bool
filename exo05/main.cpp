@@ -42,6 +42,6 @@ int main( int argc, char **argv ){
 		exit( 1 );
 	}
 	std::string formula( argv[1] );
-	std::cout << "negation_normal_form : " << negation_normal_form( formula ) << std::endl;
+	std::cout << negation_normal_form( formula ) << std::endl;
 	return 0;
 }

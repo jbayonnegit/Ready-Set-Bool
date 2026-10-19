@@ -36,7 +36,8 @@ class LogicNode {
 
 		bool 				compute( const bool a, const bool b ) const ;
 		bool 				solve() const;
-		
+		bool				isNeg() const;
+
 		std::ostringstream *nodeToString(  std::ostringstream *stream ) const;
 		std::string			treeToString() const;
 		LogicNode 			*extractConnectedDistrib( LogicNode * nodes, size_t i );
@@ -79,7 +80,7 @@ class LogicNode {
 						LogicNode *previousNode = stack_nodes.top(); 
 						stack_nodes.pop();
 						
-						if ( previousNode->_symbole == symbole && symbole != '>' && symbole != '=' ) {
+						if ( previousNode->_symbole == symbole && !previousNode->isNeg() && symbole != '>' && symbole != '=' ) {
 							newNode = newNode->addBranches( newNode, previousNode->_connected_nodes, previousNode->_nbBranches );
     						delete previousNode;
 						}

@@ -15,5 +15,6 @@ class Sequence : public std::vector<Variable> {
 		bool result;
 
 		void		print() const;
+		const std::vector<Variable>   order() const;
 		std::string	to_binary_formula( const std::string &formula );
 };

@@ -88,7 +88,7 @@ class LogicNode {
 						LogicNode *previousNode = stack_nodes.top(); 
 						stack_nodes.pop();
 						
-						if ( previousNode->_symbole == symbole && symbole != '>' && symbole != '=' ) {
+						if ( previousNode->_symbole == symbole && !previousNode->isNeg() && symbole != '>' && symbole != '=' ) {
 							newNode = newNode->addBranches( newNode, previousNode->_connected_nodes, previousNode->_nbBranches );
     						delete previousNode;
 						}

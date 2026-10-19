@@ -44,7 +44,7 @@ bool eval_formula( std::string &formula ) {
 
 			char symbole = formula[i];
 			node->initializeSymbole( symbole );
-			node->setBranches( right, left );
+		node->setBranches( left, right );
 			nodes.push ( node );
 		}
 	}
