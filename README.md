@@ -314,7 +314,7 @@ make -C exo09 fclean
 
 ## Command test example
 
-Two expression are equal if they share the same truth table
+Two expressions are equal if they share the same truth table
 
 ```
 VAR="ABC>>"; ../exo04/thruth `./CNF "$VAR"` > test1 && ../exo04/thruth "$VAR" > test2; diff test1 test2
